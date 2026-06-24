@@ -25,7 +25,7 @@ const links = [
   <header class="header" :class="{ 'is-scrolled': scrolled }">
     <div class="container header-inner">
       <a href="#inicio" class="brand" aria-label="LØN — Inicio">
-        <img src="/logo.jpeg" alt="LØN" class="brand-logo" />
+        <img src="/logo.png" alt="LØN" class="brand-logo" />
         <span class="brand-name">LØN</span>
       </a>
 

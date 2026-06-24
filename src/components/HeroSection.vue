@@ -37,7 +37,7 @@
 
       <div class="hero-visual" aria-hidden="true">
         <div class="hero-card hero-card--lg">
-          <img src="/logo.jpeg" alt="" class="hero-logo" />
+          <img src="/logo.png" alt="" class="hero-logo" />
         </div>
         <div class="hero-card hero-card--sm">
           <span class="badge">Nuevo</span>

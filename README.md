@@ -29,7 +29,7 @@ npm run preview  # previsualizar el build
 
 ```
 public/
-  logo.jpeg                  Logo de LØN
+  logo.png                   Logo de LØN
 src/
   main.js
   style.css                  Variables de tema (claro/oscuro) y utilidades

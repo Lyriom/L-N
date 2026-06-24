@@ -8,7 +8,7 @@ const year = new Date().getFullYear()
     <div class="container footer-inner">
       <div class="footer-brand">
         <div class="footer-logo">
-          <img src="/logo.jpeg" alt="LØN" />
+          <img src="/logo.png" alt="LØN" />
           <span>LØN</span>
         </div>
         <p>
