@@ -1,0 +1,185 @@
+<script setup>
+// Sección de presentación. Solo "caparazón" — contenido estático por ahora.
+</script>
+
+<template>
+  <section id="inicio" class="hero">
+    <div class="container hero-inner">
+      <div class="hero-copy">
+        <span class="eyebrow">Temporada 2026 · Nueva colección</span>
+        <h1 class="hero-title">
+          Moda que se siente <span class="accent">tan tuya</span> como atrevida.
+        </h1>
+        <p class="hero-text">
+          En LØN diseñamos prendas contemporáneas, versátiles y a la moda.
+          Piezas cuidadas para quienes visten su propia historia.
+        </p>
+        <div class="hero-cta">
+          <a href="#catalogo" class="btn btn-primary">Ver catálogo</a>
+          <a href="#nosotros" class="btn btn-ghost">Conócenos</a>
+        </div>
+
+        <div class="hero-stats">
+          <div class="stat">
+            <strong>+200</strong>
+            <span>prendas en colección</span>
+          </div>
+          <div class="stat">
+            <strong>100%</strong>
+            <span>diseño propio</span>
+          </div>
+          <div class="stat">
+            <strong>24/7</strong>
+            <span>tienda online</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-visual" aria-hidden="true">
+        <div class="hero-card hero-card--lg">
+          <img src="/logo.jpeg" alt="" class="hero-logo" />
+        </div>
+        <div class="hero-card hero-card--sm">
+          <span class="badge">Nuevo</span>
+        </div>
+        <div class="hero-blob"></div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding: 80px 0 96px;
+  background:
+    radial-gradient(
+      circle at 80% 0%,
+      color-mix(in srgb, var(--accent) 14%, transparent),
+      transparent 45%
+    ),
+    var(--bg);
+}
+
+.hero-inner {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 56px;
+  align-items: center;
+}
+
+.hero-title {
+  font-size: clamp(2.4rem, 5vw, 3.8rem);
+  font-weight: 700;
+  margin-bottom: 22px;
+}
+
+.accent {
+  color: var(--accent);
+}
+
+.hero-text {
+  font-size: 1.12rem;
+  color: var(--text-muted);
+  max-width: 480px;
+  margin-bottom: 32px;
+}
+
+.hero-cta {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 48px;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.stat strong {
+  display: block;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.stat span {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Visual */
+.hero-visual {
+  position: relative;
+  min-height: 420px;
+}
+
+.hero-card {
+  position: absolute;
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+
+.hero-card--lg {
+  inset: 0 40px 60px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-logo {
+  width: 70%;
+  max-width: 280px;
+  object-fit: contain;
+}
+
+.hero-card--sm {
+  width: 150px;
+  height: 150px;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: flex-end;
+  padding: 18px;
+}
+
+.badge {
+  background-color: var(--accent);
+  color: var(--accent-contrast);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 999px;
+}
+
+.hero-blob {
+  position: absolute;
+  inset: 30px -30px auto auto;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--accent) 30%, transparent),
+    transparent 70%
+  );
+  filter: blur(10px);
+  z-index: -1;
+}
+
+@media (max-width: 880px) {
+  .hero-inner {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .hero-visual {
+    min-height: 320px;
+    order: -1;
+  }
+}
+</style>
