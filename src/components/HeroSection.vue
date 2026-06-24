@@ -39,9 +39,6 @@
         <div class="hero-card hero-card--lg">
           <img src="/logo.png" alt="" class="hero-logo" />
         </div>
-        <div class="hero-card hero-card--sm">
-          <span class="badge">Nuevo</span>
-        </div>
         <div class="hero-blob"></div>
       </div>
     </div>
@@ -126,7 +123,7 @@
 }
 
 .hero-card--lg {
-  inset: 0 40px 60px 0;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -136,25 +133,6 @@
   width: 70%;
   max-width: 280px;
   object-fit: contain;
-}
-
-.hero-card--sm {
-  width: 150px;
-  height: 150px;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  align-items: flex-end;
-  padding: 18px;
-}
-
-.badge {
-  background-color: var(--accent);
-  color: var(--accent-contrast);
-  font-size: 0.78rem;
-  font-weight: 600;
-  padding: 6px 14px;
-  border-radius: 999px;
 }
 
 .hero-blob {

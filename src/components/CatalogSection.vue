@@ -18,11 +18,11 @@ import ProductCard from './ProductCard.vue'
  * es la que esperará el front, así que el backend solo debe devolver ese shape.
  */
 const products = ref([
-  { id: 1, name: 'Camiseta Oversize Lima', category: 'Camisetas', price: 24.9, tag: 'Nuevo', image: null },
+  { id: 1, name: 'Camiseta Oversize Lima', category: 'Camisetas', price: 24.9, tag: null, image: null },
   { id: 2, name: 'Pantalón Cargo Mod', category: 'Pantalones', price: 49.9, tag: null, image: null },
   { id: 3, name: 'Hoodie Esencial', category: 'Abrigos', price: 59.9, tag: 'Top ventas', image: null },
   { id: 4, name: 'Vestido Lino Brisa', category: 'Vestidos', price: 64.0, tag: null, image: null },
-  { id: 5, name: 'Chaqueta Denim Azur', category: 'Abrigos', price: 79.9, tag: 'Nuevo', image: null },
+  { id: 5, name: 'Chaqueta Denim Azur', category: 'Abrigos', price: 79.9, tag: null, image: null },
   { id: 6, name: 'Falda Plisada Nube', category: 'Faldas', price: 39.9, tag: null, image: null },
   { id: 7, name: 'Camisa Oxford Clara', category: 'Camisas', price: 44.9, tag: null, image: null },
   { id: 8, name: 'Top Punto Sereno', category: 'Camisetas', price: 29.9, tag: 'Top ventas', image: null },
