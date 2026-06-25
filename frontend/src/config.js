@@ -26,13 +26,58 @@ export function whatsappLink(product) {
   return `${base}?text=${encodeURIComponent(msg)}`
 }
 
-export function instagramLink(product) {
+export function instagramLink() {
+  return INSTAGRAM_DM_URL
+}
+
+export function instagramMessage(product) {
   const tallas = formatSizes(product?.sizes)
-  const msg =
+  return (
     `Hola LØN, busco más información sobre ${product?.name || 'este artículo'}` +
     (product?.color ? ` · Color: ${product.color}` : '') +
     (tallas ? ` · Talla: ${tallas}` : '') +
     (product?.price ? ` · Precio: $${product.price}` : '')
+  )
+}
 
-  return `${INSTAGRAM_DM_URL}?text=${encodeURIComponent(msg)}`
+function copyWithFallback(text) {
+  const textarea = document.createElement('textarea')
+  textarea.value = text
+  textarea.setAttribute('readonly', '')
+  textarea.style.position = 'fixed'
+  textarea.style.top = '-9999px'
+  document.body.appendChild(textarea)
+  textarea.select()
+
+  try {
+    document.execCommand('copy')
+  } finally {
+    document.body.removeChild(textarea)
+  }
+}
+
+export async function openInstagramOrder(product) {
+  const msg = instagramMessage(product)
+  const dmUrl = instagramLink()
+
+  if (typeof window === 'undefined') return
+
+  const tab = window.open('about:blank', '_blank')
+  if (tab) tab.opener = null
+
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(msg)
+    } else {
+      copyWithFallback(msg)
+    }
+  } catch {
+    copyWithFallback(msg)
+  } finally {
+    if (tab) {
+      tab.location.href = dmUrl
+    } else {
+      window.location.href = dmUrl
+    }
+  }
 }
