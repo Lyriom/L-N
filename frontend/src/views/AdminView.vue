@@ -117,10 +117,41 @@ async function loadAll() {
 
 // ---------- Editar / crear ----------
 function openNew() {
-  form.value = { id: null, code: '', name: '', category: '', type: '', size: '', qty: 1, price: 0, active: 1 }
+  form.value = { id: null, code: '', name: '', category: '', type: '', size: '', qty: 1, price: 0, active: 1, images: [] }
 }
 function openEdit(p) {
-  form.value = { ...p, active: p.active ? 1 : 0 }
+  form.value = { ...p, images: Array.isArray(p.images) ? [...p.images] : [], active: p.active ? 1 : 0 }
+}
+
+// Subir fotos al producto en edición.
+const uploading = ref(false)
+async function onUpload(e) {
+  const files = e.target.files
+  if (!files?.length || !form.value?.id) return
+  uploading.value = true
+  try {
+    const updated = await api.uploadImages(form.value.id, files)
+    form.value.images = Array.isArray(updated.images) ? updated.images : []
+    await loadAll()
+    flash('Foto(s) subida(s).')
+  } catch (err) {
+    flash(err.message || 'Error al subir.')
+  } finally {
+    uploading.value = false
+    e.target.value = ''
+  }
+}
+async function removeImage(i) {
+  if (!form.value?.id) return
+  const next = [...(form.value.images || [])]
+  next.splice(i, 1)
+  try {
+    const updated = await api.updateProduct(form.value.id, { images: next })
+    form.value.images = Array.isArray(updated.images) ? updated.images : []
+    await loadAll()
+  } catch (err) {
+    flash(err.message || 'Error al quitar la foto.')
+  }
 }
 async function saveForm() {
   if (!form.value) return
@@ -392,6 +423,23 @@ onMounted(async () => {
             <span>Visible en la tienda</span>
           </label>
         </div>
+
+        <!-- Fotos -->
+        <div class="img-manager">
+          <span class="img-label">Fotos</span>
+          <div v-if="form.id" class="img-grid">
+            <div v-for="(img, i) in form.images" :key="i" class="img-thumb">
+              <img :src="photoUrl(img)" alt="" />
+              <button type="button" class="img-del" title="Quitar" @click="removeImage(i)">✕</button>
+            </div>
+            <label class="img-add" :class="{ busy: uploading }">
+              <input type="file" accept="image/*" multiple hidden @change="onUpload" />
+              <span>{{ uploading ? 'Subiendo…' : '+ Subir foto' }}</span>
+            </label>
+          </div>
+          <p v-else class="img-hint">Guarda el producto primero para poder subir fotos.</p>
+        </div>
+
         <div class="sheet-actions">
           <button class="btn btn-ghost btn-sm" @click="form = null">Cancelar</button>
           <button class="btn btn-primary btn-sm" :disabled="busy" @click="saveForm">
@@ -707,6 +755,66 @@ onMounted(async () => {
 }
 .sell-prod { color: var(--text-muted); margin: 0 0 16px; font-size: 0.92rem; }
 .sell-total { margin: 6px 0 0; font-size: 1.05rem; }
+
+/* ---------- Gestor de fotos ---------- */
+.img-manager { margin: 8px 0 4px; }
+.img-label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+.img-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.img-thumb {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.img-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.img-del {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.img-del:hover { background-color: #e5484d; }
+.img-add {
+  width: 80px;
+  height: 80px;
+  border-radius: 10px;
+  border: 1px dashed var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 6px;
+  transition: border-color var(--transition), color var(--transition);
+}
+.img-add:hover { border-color: var(--accent); color: var(--accent); }
+.img-add.busy { opacity: 0.6; pointer-events: none; }
+.img-hint { color: var(--text-muted); font-size: 0.85rem; margin: 0; }
 
 @media (max-width: 520px) {
   .grid2 { grid-template-columns: 1fr; }

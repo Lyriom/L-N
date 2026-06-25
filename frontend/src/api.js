@@ -28,9 +28,13 @@ export const auth = {
   },
 }
 
-// URL pública de una foto a partir de su nombre de archivo.
-export function photoUrl(filename) {
-  return filename ? `/products/photos/${filename}` : null
+// URL pública de una foto.
+// - Fotos subidas desde el admin: ya vienen como ruta absoluta (/api/uploads/... o http).
+// - Fotos del listado inicial: solo el nombre de archivo -> /products/photos/<nombre>.
+export function photoUrl(name) {
+  if (!name) return null
+  if (/^https?:\/\//.test(name) || name.startsWith('/')) return name
+  return `/products/photos/${name}`
 }
 
 async function request(path, { method = 'GET', body, adminAuth = false } = {}) {
@@ -69,4 +73,24 @@ export const api = {
   deleteProduct: (id) => request(`/api/admin/products/${id}`, { method: 'DELETE', adminAuth: true }),
   sell: (id, data) => request(`/api/admin/products/${id}/sell`, { method: 'POST', body: data, adminAuth: true }),
   sales: () => request('/api/admin/sales', { adminAuth: true }),
+
+  // Subida de fotos (multipart). Devuelve el producto actualizado.
+  uploadImages: async (id, files) => {
+    const fd = new FormData()
+    for (const f of files) fd.append('images', f)
+    const res = await fetch(`${API_BASE}/api/admin/products/${id}/images`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${auth.token}` },
+      body: fd,
+    })
+    if (!res.ok) {
+      let msg = `Error ${res.status}`
+      try {
+        const d = await res.json()
+        if (d?.error) msg = d.error
+      } catch (_) {}
+      throw new Error(msg)
+    }
+    return res.json()
+  },
 }

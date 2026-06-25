@@ -1,15 +1,42 @@
+import fs from 'node:fs'
+import path from 'node:path'
+import crypto from 'node:crypto'
+import { fileURLToPath } from 'node:url'
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
+import multer from 'multer'
 import { pool } from './db.js'
 import { requireAuth } from './auth.js'
 import { ensureSchema, importProducts } from './seed.js'
 
 dotenv.config()
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+// Carpeta persistente donde se guardan las fotos subidas desde el admin.
+// En EasyPanel monta un volumen en /app/uploads (default ../uploads = /app/uploads).
+const UPLOAD_DIR = process.env.UPLOAD_DIR || path.resolve(__dirname, '../uploads')
+fs.mkdirSync(UPLOAD_DIR, { recursive: true })
+
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: (_req, _file, cb) => cb(null, UPLOAD_DIR),
+    filename: (_req, file, cb) => {
+      const ext = (path.extname(file.originalname) || '.jpg').toLowerCase()
+      cb(null, `${Date.now()}-${crypto.randomBytes(5).toString('hex')}${ext}`)
+    },
+  }),
+  limits: { fileSize: 8 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => cb(null, /^image\//.test(file.mimetype)),
+})
+
 const app = express()
 app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }))
 app.use(express.json())
+
+// Sirve las fotos subidas (el frontend hace proxy de /api al backend).
+app.use('/api/uploads', express.static(UPLOAD_DIR))
 
 // Campos que el admin puede editar en un producto.
 const EDITABLE = ['code', 'category', 'name', 'type', 'size', 'qty', 'price', 'active']
@@ -158,6 +185,23 @@ app.post('/api/admin/products/:id/sell', requireAuth, async (req, res, next) => 
     next(e)
   } finally {
     conn.release()
+  }
+})
+
+// Subir fotos a un producto (multipart, campo "images"). Las añade a su galería.
+app.post('/api/admin/products/:id/images', requireAuth, upload.array('images', 8), async (req, res, next) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM products WHERE id = ?', [req.params.id])
+    if (!rows.length) return res.status(404).json({ error: 'Producto no encontrado' })
+    const current = Array.isArray(rows[0].images) ? rows[0].images : []
+    const added = (req.files || []).map((f) => `/api/uploads/${f.filename}`)
+    if (!added.length) return res.status(400).json({ error: 'No se recibió ninguna imagen' })
+    const images = [...current, ...added]
+    await pool.query('UPDATE products SET images = ? WHERE id = ?', [JSON.stringify(images), req.params.id])
+    const [updated] = await pool.query('SELECT * FROM products WHERE id = ?', [req.params.id])
+    res.json(updated[0])
+  } catch (e) {
+    next(e)
   }
 })
 

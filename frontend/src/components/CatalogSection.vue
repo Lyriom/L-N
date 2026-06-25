@@ -15,11 +15,23 @@ const products = ref([])
 const loading = ref(true)
 const error = ref('')
 
-// Agrupa filas por nombre+categoría -> una tarjeta con variantes (tallas).
+// Huella "difusa" del nombre para agrupar aunque haya typos:
+// quita acentos, espacios y signos, y colapsa letras repetidas
+// (HODDIE/HOODIE -> hodie, ADDIDAS/ADIDAS -> adidas).
+function fingerprint(name) {
+  return String(name || '')
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '')
+    .replace(/(.)\1+/g, '$1')
+}
+
+// Agrupa filas de la misma prenda -> una tarjeta con variantes (tallas).
 function groupProducts(list) {
   const groups = new Map()
   for (const p of list) {
-    const key = `${(p.name || '').trim().toLowerCase()}|${p.category || ''}`
+    const key = `${fingerprint(p.name)}|${p.category || ''}`
     if (!groups.has(key)) {
       groups.set(key, {
         key,
