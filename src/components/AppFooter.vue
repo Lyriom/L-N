@@ -8,12 +8,11 @@ const year = new Date().getFullYear()
     <div class="container footer-inner">
       <div class="footer-brand">
         <div class="footer-logo">
-          <img src="/logo.png" alt="LØN" />
-          <span>LØN</span>
+          <img src="/logo-mark.png" alt="LØN" />
         </div>
         <p>
-          Moda contemporánea y a la moda. Diseño propio, piezas versátiles
-          para vestir tu día a día.
+          Tu tienda de ropa, accesorios y essentials a la moda. Piezas
+          seleccionadas para vestir tu día a día.
         </p>
       </div>
 
@@ -69,16 +68,13 @@ const year = new Date().getFullYear()
 }
 
 .footer-logo img {
-  width: 34px;
-  height: 34px;
+  height: 56px;
+  width: auto;
   object-fit: contain;
-  border-radius: 7px;
 }
 
-.footer-logo span {
-  font-weight: 700;
-  font-size: 1.15rem;
-  letter-spacing: 0.12em;
+[data-theme="dark"] .footer-logo img {
+  filter: brightness(0) invert(1);
 }
 
 .footer-brand p {

@@ -26,6 +26,10 @@ const products = ref([
   { id: 6, name: 'Falda Plisada Nube', category: 'Faldas', price: 39.9, tag: null, image: null },
   { id: 7, name: 'Camisa Oxford Clara', category: 'Camisas', price: 44.9, tag: null, image: null },
   { id: 8, name: 'Top Punto Sereno', category: 'Camisetas', price: 29.9, tag: 'Top ventas', image: null },
+  { id: 9, name: 'Gorra Mínimal LØN', category: 'Accesorios', price: 19.9, tag: null, image: null },
+  { id: 10, name: 'Tote Bag Lona', category: 'Accesorios', price: 22.9, tag: null, image: null },
+  { id: 11, name: 'Pack Básicos Algodón', category: 'Essentials', price: 34.9, tag: 'Top ventas', image: null },
+  { id: 12, name: 'Calcetines Pack x3', category: 'Essentials', price: 12.9, tag: null, image: null },
 ])
 
 // Filtros por categoría, derivados de los propios productos.

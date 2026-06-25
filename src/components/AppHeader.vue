@@ -25,8 +25,7 @@ const links = [
   <header class="header" :class="{ 'is-scrolled': scrolled }">
     <div class="container header-inner">
       <a href="#inicio" class="brand" aria-label="LØN — Inicio">
-        <img src="/logo.png" alt="LØN" class="brand-logo" />
-        <span class="brand-name">LØN</span>
+        <img src="/logo-mark.png" alt="LØN" class="brand-logo" />
       </a>
 
       <nav class="nav" :class="{ open: menuOpen }">
@@ -105,16 +104,14 @@ const links = [
 }
 
 .brand-logo {
-  width: 38px;
-  height: 38px;
+  height: 48px;
+  width: auto;
   object-fit: contain;
-  border-radius: 8px;
 }
 
-.brand-name {
-  font-weight: 700;
-  font-size: 1.25rem;
-  letter-spacing: 0.12em;
+/* En modo oscuro el logo (líneas y texto) se aclara para contrastar con el negro */
+[data-theme="dark"] .brand-logo {
+  filter: brightness(0) invert(1);
 }
 
 .nav {

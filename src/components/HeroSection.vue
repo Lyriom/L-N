@@ -11,8 +11,8 @@
           Moda que se siente <span class="accent">tan tuya</span> como atrevida.
         </h1>
         <p class="hero-text">
-          En LØN diseñamos prendas contemporáneas, versátiles y a la moda.
-          Piezas cuidadas para quienes visten su propia historia.
+          En LØN encuentras ropa, accesorios y essentials a la moda.
+          Piezas seleccionadas para quienes visten su propia historia.
         </p>
         <div class="hero-cta">
           <a href="#catalogo" class="btn btn-primary">Ver catálogo</a>
@@ -22,11 +22,11 @@
         <div class="hero-stats">
           <div class="stat">
             <strong>+200</strong>
-            <span>prendas en colección</span>
+            <span>productos en catálogo</span>
           </div>
           <div class="stat">
             <strong>100%</strong>
-            <span>diseño propio</span>
+            <span>selección curada</span>
           </div>
           <div class="stat">
             <strong>24/7</strong>
@@ -37,7 +37,7 @@
 
       <div class="hero-visual" aria-hidden="true">
         <div class="hero-card hero-card--lg">
-          <img src="/logo.png" alt="" class="hero-logo" />
+          <img src="/logo-mark.png" alt="" class="hero-logo" />
         </div>
         <div class="hero-blob"></div>
       </div>
@@ -133,6 +133,10 @@
   width: 70%;
   max-width: 280px;
   object-fit: contain;
+}
+
+[data-theme="dark"] .hero-logo {
+  filter: brightness(0) invert(1);
 }
 
 .hero-blob {
