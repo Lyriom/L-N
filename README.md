@@ -69,24 +69,32 @@ npm run dev               # web en http://localhost:5173
 | `PORT` | Puerto de la API (3001) |
 | `DB_HOST` `DB_PORT` `DB_USER` `DB_PASSWORD` `DB_NAME` | Conexión MySQL |
 | `ADMIN_TOKEN` | Token del panel. Genera uno: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` |
-| `CORS_ORIGIN` | URL del frontend (usa `*` solo en pruebas) |
+| `CORS_ORIGIN` | Solo si NO usas el proxy (frontend y backend en dominios distintos). Con proxy, deja `*`. |
 
-**frontend/.env**
+**frontend** — variables:
 
-| Variable | Descripción |
-| --- | --- |
-| `VITE_API_URL` | URL pública del backend |
+| Variable | Dónde | Descripción |
+| --- | --- | --- |
+| `API_UPSTREAM` | Entorno del contenedor (EasyPanel) | Backend interno al que se hace proxy `/api`, p. ej. `http://thelonec_backend:3001`. |
+| `VITE_API_URL` | Build (`.env`) | Opcional. Solo si prefieres apuntar a una URL de backend distinta en vez del proxy. En dev: `http://localhost:3001`. |
 
 ## Despliegue en EasyPanel
 
-Tres servicios:
+Todo bajo **un solo dominio** (el frontend hace de proxy de `/api` al backend, así no
+hay CORS ni subdominios). Tres servicios en el mismo proyecto:
 
-1. **MySQL** — crea la base (p. ej. `lon`).
-2. **Backend** (App) — build context `backend/`, variables de entorno con las
-   credenciales de MySQL + `ADMIN_TOKEN` + `CORS_ORIGIN` (dominio del frontend).
-   Tras el primer deploy, ejecuta el seed una vez: `npm run seed`.
-3. **Frontend** (App) — build context `frontend/`, con `VITE_API_URL` apuntando a la
-   URL del backend. Se sirve estático con nginx (ver `frontend/Dockerfile`).
+1. **MySQL** — ya creado. Anota el *Internal Host*, usuario, contraseña y base.
+2. **Backend** (App) — *Build context* `backend/` (usa `backend/Dockerfile`).
+   Variables de entorno:
+   - `DB_HOST` = Internal Host de MySQL · `DB_PORT` = 3306
+   - `DB_USER` / `DB_PASSWORD` / `DB_NAME`
+   - `ADMIN_TOKEN` = token del panel
+   - No necesita dominio público.
+   - Al primer arranque crea las tablas e **importa el Excel + fotos automáticamente**
+     (si el inventario está vacío). No hace falta seed manual.
+3. **Frontend** (App) — *Build context* `frontend/` (usa `frontend/Dockerfile`).
+   - Dominio: tu dominio público (p. ej. `thelonec.com`).
+   - Variable de entorno `API_UPSTREAM` = `http://<Internal Host del backend>:3001`.
 
 La URL para compartir el panel: `https://<dominio>/admin?token=<ADMIN_TOKEN>`.
 
