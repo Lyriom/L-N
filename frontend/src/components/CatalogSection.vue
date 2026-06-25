@@ -105,7 +105,7 @@ const selected = ref(null)
         </div>
         <p class="catalog-sub">
           Ropa de marca con las mejores calidades. Toca cualquier prenda para ver
-          los detalles y pedirla por WhatsApp.
+          los detalles y pedirla por Instagram o WhatsApp.
         </p>
       </header>
 

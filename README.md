@@ -3,7 +3,7 @@
 Proyecto de **LØN**: tienda pública + panel de administración de inventario.
 
 - **`frontend/`** — Web en **Vue 3 + Vite**. Tienda pública (catálogo con fotos y
-  pedido por WhatsApp) y panel de admin en `/admin` protegido por token.
+  pedido por Instagram o WhatsApp) y panel de admin en `/admin` protegido por token.
 - **`backend/`** — API en **Node + Express** conectada a **MySQL**. Sirve el catálogo
   público y la gestión de inventario/ventas.
 
