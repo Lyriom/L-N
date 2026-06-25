@@ -355,11 +355,24 @@ onMounted(async () => {
                   <button class="act sell" :disabled="p.qty <= 0" title="Registrar venta" @click="openSell(p)">
                     Vender
                   </button>
-                  <button class="act edit" title="Editar / subir fotos" @click="openEdit(p)">✏️ Editar</button>
-                  <button class="act" :title="p.active ? 'Ocultar' : 'Activar'" @click="toggleActive(p)">
-                    {{ p.active ? 'Ocultar' : 'Activar' }}
+                  <button class="act icon" title="Editar / subir fotos" @click="openEdit(p)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M12 20h9" /><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                    </svg>
                   </button>
-                  <button class="act danger" title="Eliminar" @click="removeProduct(p)">✕</button>
+                  <button class="act icon" :title="p.active ? 'Ocultar en la tienda' : 'Mostrar en la tienda'" @click="toggleActive(p)">
+                    <svg v-if="p.active" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" />
+                    </svg>
+                    <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c6.5 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" /><path d="M6.61 6.61A13.5 13.5 0 0 0 2 12s3.5 7 10 7a9.7 9.7 0 0 0 5.39-1.61" /><path d="m2 2 20 20" /><path d="M14.12 14.12A3 3 0 1 1 9.88 9.88" />
+                    </svg>
+                  </button>
+                  <button class="act icon danger" title="Eliminar" @click="removeProduct(p)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+                    </svg>
+                  </button>
                 </td>
               </tr>
               <tr v-if="!filtered.length">
@@ -657,7 +670,7 @@ onMounted(async () => {
 }
 .table tr:last-child td { border-bottom: none; }
 .table tr.dim { opacity: 0.5; }
-.cell-name { white-space: normal; min-width: 180px; font-weight: 500; cursor: pointer; }
+.cell-name { white-space: normal; width: 100%; min-width: 180px; font-weight: 500; cursor: pointer; }
 .cell-name:hover { color: var(--accent); }
 
 .thumb {
@@ -685,9 +698,12 @@ onMounted(async () => {
 .badge.on { background-color: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--accent); }
 .badge.off { background-color: color-mix(in srgb, #e5484d 16%, transparent); color: #e5484d; }
 
-.actions { display: flex; flex-wrap: wrap; gap: 6px; max-width: 168px; }
+.actions { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
 .act {
-  padding: 6px 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 12px;
   border-radius: 8px;
   border: 1px solid var(--border);
   background-color: var(--bg);
@@ -700,9 +716,11 @@ onMounted(async () => {
     background-color var(--transition);
 }
 .act:hover { border-color: var(--accent); color: var(--accent); }
+.act.icon { width: 34px; height: 34px; padding: 0; }
+.act.icon svg { width: 16px; height: 16px; }
 .act.sell { background-color: var(--accent); color: var(--accent-contrast); border-color: var(--accent); }
+.act.sell:hover { color: var(--accent-contrast); filter: brightness(1.05); }
 .act.sell:disabled { opacity: 0.4; cursor: not-allowed; }
-.act.edit { border-color: var(--accent); color: var(--accent); }
 .act.danger:hover { border-color: #e5484d; color: #e5484d; }
 
 /* ---------- Toast ---------- */
