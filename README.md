@@ -1,64 +1,100 @@
-# LØN — Landing
+# LØN — Tienda + Inventario
 
-Landing de **LØN**, una marca de ropa a la moda. Hecha con **Vue 3 + Vite**.
+Proyecto de **LØN**: tienda pública + panel de administración de inventario.
 
-Es el "caparazón": header con logo y toggle de tema, hero de presentación,
-sección de catálogo y footer. El catálogo usa datos de muestra y está listo
-para conectarse al backend.
+- **`frontend/`** — Web en **Vue 3 + Vite**. Tienda pública (catálogo con fotos y
+  pedido por WhatsApp) y panel de admin en `/admin` protegido por token.
+- **`backend/`** — API en **Node + Express** conectada a **MySQL**. Sirve el catálogo
+  público y la gestión de inventario/ventas.
 
-## Paleta
+La base de datos es **MySQL**; el inventario se importa una vez desde el Excel
+(`backend/data/LON-LISTADO.xlsx`) y a partir de ahí MySQL es la fuente de verdad.
 
-| Modo   | Fondo  | Acento  |
-| ------ | ------ | ------- |
-| Claro  | Blanco | Celeste |
-| Oscuro | Negro  | Celeste |
+```
+frontend/                 Web Vue (tienda + /admin)
+  public/products/photos/ Fotos reales de producto (<código><A|B|C>.jpeg)
+  src/
+    api.js                Cliente de la API (token Bearer en localStorage)
+    router.js             Rutas: / (tienda) y /admin (panel)
+    views/HomeView.vue    Tienda pública
+    views/AdminView.vue   Panel: login por token, inventario, ventas
+    components/           Header, hero, catálogo, tarjeta, modal, footer
+backend/
+  data/LON-LISTADO.xlsx   Excel de origen (solo para el seed)
+  src/
+    server.js             API Express
+    db.js                 Pool MySQL (mysql2)
+    auth.js               Middleware del token de admin
+    schema.sql            Tablas products / sales
+    seed.js               Importa el Excel a MySQL  (npm run seed)
+```
 
-El tema se controla con el atributo `data-theme` en `<html>` y se persiste en
-`localStorage` (respeta la preferencia del sistema la primera vez).
+## Desarrollo local
 
-## Scripts
+**1. MySQL** (ejemplo con Docker):
 
 ```bash
-npm install      # instalar dependencias
-npm run dev      # servidor de desarrollo
-npm run build    # build de producción (carpeta dist/)
-npm run preview  # previsualizar el build
+docker run -d --name lon-mysql -e MYSQL_ROOT_PASSWORD=lonpass \
+  -e MYSQL_DATABASE=lon -p 3306:3306 mysql:8
 ```
 
-## Estructura
+**2. Backend**:
 
-```
-public/
-  logo.png                   Logo de LØN
-src/
-  main.js
-  style.css                  Variables de tema (claro/oscuro) y utilidades
-  App.vue
-  composables/
-    useTheme.js              Lógica del modo claro/oscuro
-  components/
-    AppHeader.vue            Logo + navegación + toggle de tema
-    HeroSection.vue          Presentación de la marca
-    CatalogSection.vue       Catálogo + filtros (datos de muestra)
-    ProductCard.vue          Tarjeta de producto
-    AppFooter.vue            Pie de página
+```bash
+cd backend
+cp .env.example .env      # ajusta credenciales y ADMIN_TOKEN
+npm install
+npm run seed              # importa el Excel a MySQL (una vez)
+npm run dev               # API en http://localhost:3001
 ```
 
-## Conectar el backend
+**3. Frontend**:
 
-En `src/components/CatalogSection.vue` reemplaza los datos de muestra por una
-llamada a la API. El front espera productos con este shape:
-
-```js
-{ id, name, category, price, tag, image }
+```bash
+cd frontend
+cp .env.example .env      # VITE_API_URL=http://localhost:3001
+npm install
+npm run dev               # web en http://localhost:5173
 ```
 
-```js
-import { ref, onMounted } from 'vue'
+- Tienda pública: http://localhost:5173/
+- Panel admin: http://localhost:5173/admin?token=TU_TOKEN
 
-const products = ref([])
-onMounted(async () => {
-  const res = await fetch('/api/products')
-  products.value = await res.json()
-})
-```
+## Variables de entorno
+
+**backend/.env**
+
+| Variable | Descripción |
+| --- | --- |
+| `PORT` | Puerto de la API (3001) |
+| `DB_HOST` `DB_PORT` `DB_USER` `DB_PASSWORD` `DB_NAME` | Conexión MySQL |
+| `ADMIN_TOKEN` | Token del panel. Genera uno: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` |
+| `CORS_ORIGIN` | URL del frontend (usa `*` solo en pruebas) |
+
+**frontend/.env**
+
+| Variable | Descripción |
+| --- | --- |
+| `VITE_API_URL` | URL pública del backend |
+
+## Despliegue en EasyPanel
+
+Tres servicios:
+
+1. **MySQL** — crea la base (p. ej. `lon`).
+2. **Backend** (App) — build context `backend/`, variables de entorno con las
+   credenciales de MySQL + `ADMIN_TOKEN` + `CORS_ORIGIN` (dominio del frontend).
+   Tras el primer deploy, ejecuta el seed una vez: `npm run seed`.
+3. **Frontend** (App) — build context `frontend/`, con `VITE_API_URL` apuntando a la
+   URL del backend. Se sirve estático con nginx (ver `frontend/Dockerfile`).
+
+La URL para compartir el panel: `https://<dominio>/admin?token=<ADMIN_TOKEN>`.
+
+## Panel de administrador
+
+- Acceso con **token** (en `.env` del backend) + **nombre** de quien gestiona.
+- **Inventario**: buscar/filtrar, editar (nombre, talla, precio, stock, categoría,
+  visibilidad), añadir y eliminar productos.
+- **Vender**: descuenta stock y registra la venta (producto, talla, cantidad, precio,
+  vendedor, fecha). Cuando el stock llega a 0, el producto desaparece de la tienda pública.
+- **Ventas**: historial de todas las ventas registradas.

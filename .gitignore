@@ -4,6 +4,11 @@ dist-ssr
 *.local
 .DS_Store
 
+# Variables de entorno (los .env.example sí se versionan)
+.env
+.env.*
+!.env.example
+
 # Páginas de Instagram guardadas (fuente de las fotos de producto)
 _ig-source
 
