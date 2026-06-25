@@ -32,7 +32,13 @@ const year = new Date().getFullYear()
 
       <div class="footer-col">
         <h4>Síguenos</h4>
-        <a href="#" aria-label="Instagram">Instagram</a>
+        <a
+          href="https://www.instagram.com/lon_ecu"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Instagram"
+          >Instagram</a
+        >
       </div>
     </div>
 
