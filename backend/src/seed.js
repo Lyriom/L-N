@@ -1,9 +1,12 @@
 /*
- * Importa el Excel a MySQL (carga inicial).
- *   npm run seed
+ * Importa el Excel a MySQL.
+ *   npm run seed          -> ejecuta la importación manualmente
+ * También se usa desde server.js para la migración automática al desplegar.
  *
  * - Parsea las 8 hojas de categoría por NOMBRE de columna (no por posición).
- * - Asocia las fotos por código (97 -> 97A.jpeg, 97B.jpeg...).
+ * - Asocia las fotos por código (97 -> 97A.jpeg, 97B.jpeg...). Si la carpeta de
+ *   fotos del frontend no está disponible (caso del contenedor del backend),
+ *   usa el manifiesto backend/data/images.json.
  * - Inserta productos nuevos; en los que ya existen solo refresca las fotos
  *   (NO toca stock/precio/nombre para no pisar ediciones del admin).
  */
@@ -19,6 +22,7 @@ dotenv.config()
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const EXCEL = path.resolve(__dirname, '../data/LON-LISTADO.xlsx')
+const MANIFEST = path.resolve(__dirname, '../data/images.json')
 const PHOTOS = path.resolve(__dirname, '../../frontend/public/products/photos')
 
 // Hoja del Excel -> categoría mostrada.
@@ -46,17 +50,25 @@ const toNum = (v) => {
   return Number.isFinite(n) ? n : 0
 }
 
-// Construye un mapa código -> ["97A.jpeg", ...] escaneando la carpeta de fotos.
+// Mapa código -> ["97A.jpeg", ...]. Prefiere la carpeta real; si no, el manifiesto.
 function buildImageMap() {
-  const map = {}
-  if (!fs.existsSync(PHOTOS)) return map
-  for (const f of fs.readdirSync(PHOTOS)) {
-    const m = f.match(/^(\d+)[A-Za-z]/)
-    if (!m) continue
-    ;(map[m[1]] ||= []).push(f)
+  if (fs.existsSync(PHOTOS)) {
+    const files = fs.readdirSync(PHOTOS).filter((f) => /\.(jpe?g|png)$/i.test(f))
+    if (files.length) {
+      const map = {}
+      for (const f of files) {
+        const m = f.match(/^(\d+)[A-Za-z]/)
+        if (!m) continue
+        ;(map[m[1]] ||= []).push(f)
+      }
+      for (const k of Object.keys(map)) map[k].sort()
+      return map
+    }
   }
-  for (const k of Object.keys(map)) map[k].sort()
-  return map
+  if (fs.existsSync(MANIFEST)) {
+    return JSON.parse(fs.readFileSync(MANIFEST, 'utf8'))
+  }
+  return {}
 }
 
 // Extrae las filas de inventario de una hoja, mapeando por nombre de columna.
@@ -108,8 +120,8 @@ function parseSheet(wb, sheetName, category, images) {
   return out
 }
 
-async function run() {
-  // 1) Crear tablas (conexión con multipleStatements para el schema.sql).
+// Crea las tablas (conexión con multipleStatements para el schema.sql).
+export async function ensureSchema() {
   const sql = fs.readFileSync(path.resolve(__dirname, 'schema.sql'), 'utf8')
   const admin = await mysql.createConnection({
     host: process.env.DB_HOST || 'localhost',
@@ -121,16 +133,15 @@ async function run() {
   })
   await admin.query(sql)
   await admin.end()
-  console.log('✓ Tablas listas')
+}
 
-  // 2) Leer Excel + fotos.
+// Lee el Excel + fotos e inserta/actualiza en la tabla products.
+export async function importProducts() {
   const images = buildImageMap()
   const wb = xlsx.readFile(EXCEL)
   let items = []
   for (const [sheet, category] of Object.entries(SHEETS)) {
-    const parsed = parseSheet(wb, sheet, category, images)
-    console.log(`  ${sheet}: ${parsed.length} filas`)
-    items = items.concat(parsed)
+    items = items.concat(parseSheet(wb, sheet, category, images))
   }
 
   // Quitar duplicados por código (nos quedamos con la primera aparición).
@@ -138,7 +149,6 @@ async function run() {
   for (const it of items) if (!byCode.has(it.code)) byCode.set(it.code, it)
   items = [...byCode.values()]
 
-  // 3) Insertar (refresca solo fotos en los existentes).
   let inserted = 0
   for (const it of items) {
     const [r] = await pool.query(
@@ -149,15 +159,25 @@ async function run() {
     )
     if (r.affectedRows === 1) inserted++
   }
-
   const withPhoto = items.filter((i) => i.images.length).length
-  console.log(`\n✓ ${items.length} productos procesados (${inserted} nuevos)`)
-  console.log(`✓ ${withPhoto} con foto, ${items.length - withPhoto} sin foto`)
-  await pool.end()
-  process.exit(0)
+  return { total: items.length, inserted, withPhoto }
 }
 
-run().catch((e) => {
-  console.error('Error en el seed:', e)
-  process.exit(1)
-})
+export async function runSeed() {
+  await ensureSchema()
+  console.log('✓ Tablas listas')
+  const { total, inserted, withPhoto } = await importProducts()
+  console.log(`✓ ${total} productos procesados (${inserted} nuevos)`)
+  console.log(`✓ ${withPhoto} con foto, ${total - withPhoto} sin foto`)
+}
+
+// Ejecutado directamente con `npm run seed`.
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  runSeed()
+    .then(() => pool.end())
+    .then(() => process.exit(0))
+    .catch((e) => {
+      console.error('Error en el seed:', e)
+      process.exit(1)
+    })
+}

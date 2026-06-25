@@ -3,6 +3,7 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import { pool } from './db.js'
 import { requireAuth } from './auth.js'
+import { ensureSchema, importProducts } from './seed.js'
 
 dotenv.config()
 
@@ -176,4 +177,24 @@ app.use((err, _req, res, _next) => {
 })
 
 const port = Number(process.env.PORT) || 3001
-app.listen(port, () => console.log(`LØN API escuchando en :${port}`))
+
+// Migración automática: crea las tablas y, si el inventario está vacío,
+// importa el Excel + fotos la primera vez que arranca (deploy en EasyPanel).
+async function init() {
+  try {
+    await ensureSchema()
+    const [[row]] = await pool.query('SELECT COUNT(*) AS c FROM products')
+    if (row.c === 0) {
+      console.log('Inventario vacío: importando datos iniciales…')
+      const r = await importProducts()
+      console.log(`✓ Importados ${r.total} productos (${r.withPhoto} con foto)`)
+    } else {
+      console.log(`Inventario existente: ${row.c} productos`)
+    }
+  } catch (e) {
+    console.error('Aviso: no se pudo inicializar la base de datos:', e.message)
+  }
+  app.listen(port, () => console.log(`LØN API escuchando en :${port}`))
+}
+
+init()
