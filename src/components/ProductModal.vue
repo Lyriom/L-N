@@ -271,10 +271,33 @@ onUnmounted(() => {
     overflow-y: auto;
   }
   .modal-media {
-    aspect-ratio: 1 / 1;
+    aspect-ratio: auto;
+    padding: 10px 10px 0;
+  }
+  .modal-media img {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 34vh;
   }
   .modal-body {
-    padding: 24px;
+    padding: 16px 22px 20px;
+  }
+  .modal-name {
+    font-size: 1.3rem;
+    margin-bottom: 8px;
+  }
+  .modal-desc {
+    margin-bottom: 14px;
+  }
+  .modal-specs {
+    margin-bottom: 14px;
+  }
+  .modal-specs li {
+    padding: 9px 0;
+  }
+  .modal-note {
+    margin-bottom: 12px;
   }
 }
 </style>

@@ -24,13 +24,6 @@ const year = new Date().getFullYear()
       </div>
 
       <div class="footer-col">
-        <h4>Empresa</h4>
-        <a href="#nosotros">Sobre LØN</a>
-        <a href="#nosotros">Contacto</a>
-        <a href="#nosotros">Trabaja con nosotros</a>
-      </div>
-
-      <div class="footer-col">
         <h4>Síguenos</h4>
         <a
           href="https://www.instagram.com/lon_ecu"
@@ -59,7 +52,7 @@ const year = new Date().getFullYear()
 
 .footer-inner {
   display: grid;
-  grid-template-columns: 1.6fr 1fr 1fr 1fr;
+  grid-template-columns: 1.6fr 1fr 1fr;
   gap: 40px;
   padding: 64px 24px 48px;
 }
