@@ -11,8 +11,8 @@ const year = new Date().getFullYear()
           <img src="/logo-mark.png" alt="LØN" />
         </div>
         <p>
-          Tu tienda de ropa, accesorios y essentials a la moda. Piezas
-          seleccionadas para vestir tu día a día.
+          Tu tienda de ropa de marca con las mejores calidades: Essentials,
+          camisetas y más para vestir tu día a día.
         </p>
       </div>
 
@@ -33,8 +33,6 @@ const year = new Date().getFullYear()
       <div class="footer-col">
         <h4>Síguenos</h4>
         <a href="#" aria-label="Instagram">Instagram</a>
-        <a href="#" aria-label="TikTok">TikTok</a>
-        <a href="#" aria-label="Pinterest">Pinterest</a>
       </div>
     </div>
 

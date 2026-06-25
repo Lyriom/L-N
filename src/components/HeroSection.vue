@@ -11,8 +11,9 @@
           Moda que se siente <span class="accent">tan tuya</span> como atrevida.
         </h1>
         <p class="hero-text">
-          En LØN encuentras ropa, accesorios y essentials a la moda.
-          Piezas seleccionadas para quienes visten su propia historia.
+          En LØN encuentras ropa de marca con las mejores calidades:
+          Essentials, camisetas y mucho más. Piezas auténticas para
+          quienes visten su propia historia.
         </p>
         <div class="hero-cta">
           <a href="#catalogo" class="btn btn-primary">Ver catálogo</a>
@@ -26,7 +27,7 @@
           </div>
           <div class="stat">
             <strong>100%</strong>
-            <span>selección curada</span>
+            <span>mejores calidades</span>
           </div>
           <div class="stat">
             <strong>24/7</strong>

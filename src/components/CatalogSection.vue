@@ -56,7 +56,8 @@ const filteredProducts = computed(() =>
           <h2 class="catalog-title">Explora la colección</h2>
         </div>
         <p class="catalog-sub">
-          Una selección de piezas a la moda. Pronto, todo conectado a la tienda.
+          Ropa de marca con las mejores calidades: Essentials, camisetas y más.
+          Pronto, todo conectado a la tienda.
         </p>
       </header>
 
