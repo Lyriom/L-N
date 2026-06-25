@@ -143,13 +143,18 @@ onUnmounted(() => {
 }
 
 .modal-media {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1 / 1;
   background-color: var(--bg-soft);
+  overflow: hidden;
 }
 
 .modal-media img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
 }
 
@@ -266,7 +271,7 @@ onUnmounted(() => {
     overflow-y: auto;
   }
   .modal-media {
-    aspect-ratio: 4 / 5;
+    aspect-ratio: 1 / 1;
   }
   .modal-body {
     padding: 24px;

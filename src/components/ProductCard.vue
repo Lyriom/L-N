@@ -91,7 +91,7 @@ function formatPrice(value) {
 
 .card-media {
   position: relative;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 1 / 1;
   background-color: var(--bg-soft);
   overflow: hidden;
 }
@@ -100,6 +100,7 @@ function formatPrice(value) {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
 
 .card-placeholder {
@@ -136,6 +137,9 @@ function formatPrice(value) {
 }
 
 .card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
   padding: 18px 18px 20px;
 }
 
@@ -170,6 +174,7 @@ function formatPrice(value) {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-top: auto;
 }
 
 .card-price {
