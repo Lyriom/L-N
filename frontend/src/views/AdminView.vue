@@ -673,6 +673,16 @@ onMounted(async () => {
 .cell-name { white-space: normal; width: 100%; min-width: 180px; font-weight: 500; cursor: pointer; }
 .cell-name:hover { color: var(--accent); }
 
+/* La columna de acciones queda fija a la derecha: siempre visible. */
+.table th:last-child,
+.table td.actions {
+  position: sticky;
+  right: 0;
+  z-index: 1;
+  background-color: var(--bg-elevated);
+  box-shadow: -10px 0 12px -10px rgba(0, 0, 0, 0.35);
+}
+
 .thumb {
   width: 44px;
   height: 44px;
