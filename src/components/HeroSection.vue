@@ -161,8 +161,7 @@
     gap: 40px;
   }
   .hero-visual {
-    min-height: 320px;
-    order: -1;
+    display: none;
   }
 }
 </style>
