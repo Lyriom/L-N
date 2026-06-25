@@ -149,7 +149,7 @@ onUnmounted(() => {
               Pedir por WhatsApp
             </a>
             <a
-              :href="instagramLink()"
+              :href="instagramLink(waProduct)"
               target="_blank"
               rel="noopener noreferrer"
               class="order-btn order-btn--ig"

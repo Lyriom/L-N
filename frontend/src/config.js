@@ -26,6 +26,13 @@ export function whatsappLink(product) {
   return `${base}?text=${encodeURIComponent(msg)}`
 }
 
-export function instagramLink() {
-  return INSTAGRAM_DM_URL
+export function instagramLink(product) {
+  const tallas = formatSizes(product?.sizes)
+  const msg =
+    `Hola LØN, busco más información sobre ${product?.name || 'este artículo'}` +
+    (product?.color ? ` · Color: ${product.color}` : '') +
+    (tallas ? ` · Talla: ${tallas}` : '') +
+    (product?.price ? ` · Precio: $${product.price}` : '')
+
+  return `${INSTAGRAM_DM_URL}?text=${encodeURIComponent(msg)}`
 }

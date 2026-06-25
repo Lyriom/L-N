@@ -68,7 +68,7 @@ function formatPrice(value) {
             </svg>
           </a>
           <a
-            :href="instagramLink()"
+            :href="instagramLink(product)"
             target="_blank"
             rel="noopener noreferrer"
             class="card-btn card-btn--ig"
