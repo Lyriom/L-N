@@ -4,10 +4,10 @@
  * 👉 WHATSAPP_NUMBER: número al que se envían los pedidos, en formato
  *    internacional SIN "+", espacios ni guiones. Ejemplo Ecuador: 593991234567
  *    Mientras esté vacío, el botón abre WhatsApp sin destinatario fijo.
- * 👉 INSTAGRAM_URL: perfil de Instagram para pedidos por DM.
+ * 👉 INSTAGRAM_DM_URL: enlace directo para escribir por DM en Instagram.
  */
 export const WHATSAPP_NUMBER = '593962551884'
-export const INSTAGRAM_URL = 'https://www.instagram.com/lon_ecu'
+export const INSTAGRAM_DM_URL = 'https://ig.me/m/lon_ecu'
 
 // Formatea las tallas (['S','M'] -> "S / M")
 export function formatSizes(sizes) {
@@ -27,5 +27,5 @@ export function whatsappLink(product) {
 }
 
 export function instagramLink() {
-  return INSTAGRAM_URL
+  return INSTAGRAM_DM_URL
 }
