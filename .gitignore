@@ -4,6 +4,9 @@ dist-ssr
 *.local
 .DS_Store
 
+# Páginas de Instagram guardadas (fuente de las fotos de producto)
+_ig-source
+
 # Editor / IDE
 .vscode/*
 !.vscode/extensions.json

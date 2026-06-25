@@ -1,35 +1,102 @@
 <script setup>
 import { ref, computed } from 'vue'
 import ProductCard from './ProductCard.vue'
+import ProductModal from './ProductModal.vue'
 
 /*
- * Catálogo — "caparazón" listo para conectar al backend.
- *
- * Cuando exista la API, sustituir `products` por una llamada real, p. ej.:
- *
- *   import { onMounted } from 'vue'
- *   const products = ref([])
- *   onMounted(async () => {
- *     const res = await fetch('/api/products')
- *     products.value = await res.json()
- *   })
- *
- * La estructura de cada producto (id, name, category, price, tag, image)
- * es la que esperará el front, así que el backend solo debe devolver ese shape.
+ * Catálogo ESSENTIALS de LØN.
+ * Cada producto: id, name, category, price, color, sizes, description, tag, image.
+ * Las imágenes viven en /public/products (se sirven desde la raíz).
  */
 const products = ref([
-  { id: 1, name: 'Camiseta Oversize Lima', category: 'Camisetas', price: 24.9, tag: null, image: null },
-  { id: 2, name: 'Pantalón Cargo Mod', category: 'Pantalones', price: 49.9, tag: null, image: null },
-  { id: 3, name: 'Hoodie Esencial', category: 'Abrigos', price: 59.9, tag: 'Top ventas', image: null },
-  { id: 4, name: 'Vestido Lino Brisa', category: 'Vestidos', price: 64.0, tag: null, image: null },
-  { id: 5, name: 'Chaqueta Denim Azur', category: 'Abrigos', price: 79.9, tag: null, image: null },
-  { id: 6, name: 'Falda Plisada Nube', category: 'Faldas', price: 39.9, tag: null, image: null },
-  { id: 7, name: 'Camisa Oxford Clara', category: 'Camisas', price: 44.9, tag: null, image: null },
-  { id: 8, name: 'Top Punto Sereno', category: 'Camisetas', price: 29.9, tag: 'Top ventas', image: null },
-  { id: 9, name: 'Gorra Mínimal LØN', category: 'Accesorios', price: 19.9, tag: null, image: null },
-  { id: 10, name: 'Tote Bag Lona', category: 'Accesorios', price: 22.9, tag: null, image: null },
-  { id: 11, name: 'Pack Básicos Algodón', category: 'Essentials', price: 34.9, tag: 'Top ventas', image: null },
-  { id: 12, name: 'Calcetines Pack x3', category: 'Essentials', price: 12.9, tag: null, image: null },
+  {
+    id: 1,
+    name: 'ESSENTIALS Taupe Hoodie',
+    category: 'Hoodies',
+    price: 120,
+    color: 'Taupe Brown',
+    sizes: ['S', 'M'],
+    description: 'Un color elegante y premium para elevar tu outfit.',
+    tag: null,
+    image: '/products/taupe-hoodie.jpg',
+  },
+  {
+    id: 2,
+    name: 'ESSENTIALS Limo Hoodie',
+    category: 'Hoodies',
+    price: 100,
+    color: 'Limo',
+    sizes: ['L', 'S'],
+    description: 'Minimalista, moderno y con un look sólido para cualquier estilo.',
+    tag: null,
+    image: '/products/limo-hoodie.jpg',
+  },
+  {
+    id: 3,
+    name: 'ESSENTIALS Light Oatmeal Hoodie',
+    category: 'Hoodies',
+    price: 100,
+    color: 'Light Oatmeal',
+    sizes: ['L', 'S'],
+    description: 'Un tono suave y elegante, ideal para outfits limpios.',
+    tag: null,
+    image: '/products/light-oatmeal-hoodie.jpg',
+  },
+  {
+    id: 4,
+    name: 'ESSENTIALS Coral Hoodie',
+    category: 'Hoodies',
+    price: 120,
+    color: 'Coral',
+    sizes: ['L'],
+    description: 'Color único, fit premium y calidad brutal. Destaca donde vayas.',
+    tag: 'Edición única',
+    image: '/products/coral-hoodie.jpg',
+  },
+  {
+    id: 5,
+    name: 'ESSENTIALS Dark Oatmeal Shorts',
+    category: 'Shorts',
+    price: 70,
+    color: 'Dark Oatmeal',
+    sizes: ['S'],
+    description: 'Perfectos para entrenar o usar diario. Suaves, cómodos y con estilo.',
+    tag: null,
+    image: '/products/dark-oatmeal-shorts.jpg',
+  },
+  {
+    id: 6,
+    name: 'ESSENTIALS Light Oatmeal Tee',
+    category: 'Camisetas',
+    price: 70,
+    color: 'Light Oatmeal',
+    sizes: ['S'],
+    description: 'Un clásico en color crema, suave, limpio y combinable con todo.',
+    tag: null,
+    image: '/products/light-oatmeal-tee.jpg',
+  },
+  {
+    id: 7,
+    name: 'ESSENTIALS Dark Oatmeal Sweatpants',
+    category: 'Pantalones',
+    price: 80,
+    color: 'Dark Oatmeal',
+    sizes: ['M', 'L'],
+    description: 'Comodidad premium para tu día a día. Fit relajado y full estilo.',
+    tag: null,
+    image: '/products/dark-oatmeal-sweatpants.jpg',
+  },
+  {
+    id: 8,
+    name: 'ESSENTIALS Limo Tee',
+    category: 'Camisetas',
+    price: 70,
+    color: 'Limo',
+    sizes: ['L'],
+    description: 'Minimalista, clásica y perfecta para cualquier fit. Un básico que nunca falla.',
+    tag: null,
+    image: '/products/limo-tee.jpg',
+  },
 ])
 
 // Filtros por categoría, derivados de los propios productos.
@@ -45,6 +112,9 @@ const filteredProducts = computed(() =>
     ? products.value
     : products.value.filter((p) => p.category === activeCategory.value)
 )
+
+// Producto seleccionado para el modal de detalle (null = cerrado).
+const selected = ref(null)
 </script>
 
 <template>
@@ -53,11 +123,11 @@ const filteredProducts = computed(() =>
       <header class="catalog-head">
         <div>
           <span class="eyebrow">Catálogo</span>
-          <h2 class="catalog-title">Explora la colección</h2>
+          <h2 class="catalog-title">Colección ESSENTIALS</h2>
         </div>
         <p class="catalog-sub">
-          Ropa de marca con las mejores calidades: Essentials, camisetas y más.
-          Pronto, todo conectado a la tienda.
+          Ropa de marca con las mejores calidades. Toca cualquier prenda para ver
+          los detalles y pedirla por WhatsApp.
         </p>
       </header>
 
@@ -79,9 +149,12 @@ const filteredProducts = computed(() =>
           v-for="product in filteredProducts"
           :key="product.id"
           :product="product"
+          @select="selected = product"
         />
       </div>
     </div>
+
+    <ProductModal :product="selected" @close="selected = null" />
   </section>
 </template>
 
