@@ -3,8 +3,10 @@
  * - Lee la URL del backend de VITE_API_URL (ver .env).
  * - El token del admin se guarda en localStorage y se envía como Bearer.
  */
-// Si VITE_API_URL está vacío => mismo origen (útil si el frontend hace proxy de /api).
-const API_BASE = (import.meta.env.VITE_API_URL ?? 'http://localhost:3001').replace(/\/$/, '')
+// En producción usamos mismo origen (el nginx del frontend hace proxy de /api al backend).
+// En desarrollo apuntamos al backend local. VITE_API_URL lo sobreescribe si se define.
+const fallback = import.meta.env.PROD ? '' : 'http://localhost:3001'
+const API_BASE = (import.meta.env.VITE_API_URL ?? fallback).replace(/\/$/, '')
 
 const TOKEN_KEY = 'lon_admin_token'
 const NAME_KEY = 'lon_seller_name'

@@ -1,0 +1,35 @@
+# Plantilla de nginx. El contenedor oficial de nginx sustituye ${API_UPSTREAM}
+# (variable de entorno) al arrancar. Apunta al backend interno de EasyPanel,
+# p. ej. http://thelonec_backend:3001
+server {
+    listen 80;
+    server_name _;
+
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # Proxy de la API al backend (mismo origen, sin CORS).
+    # Con resolver + variable, nginx arranca aunque el backend no esté listo
+    # y resuelve el host en cada petición (DNS interno de Docker: 127.0.0.11).
+    location /api/ {
+        resolver 127.0.0.11 valid=10s ipv6=off;
+        set $api_upstream ${API_UPSTREAM};
+        proxy_pass $api_upstream;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # SPA: cualquier ruta desconocida cae en index.html
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Cache largo para los assets con hash de Vite
+    location /assets/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+}

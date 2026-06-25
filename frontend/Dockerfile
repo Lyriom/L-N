@@ -13,8 +13,11 @@ RUN npm run build
 # ---------- Etapa 2: servir el estático con nginx ----------
 FROM nginx:alpine
 
-# Config de nginx para SPA
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Backend interno al que se hace proxy /api (se puede sobreescribir en EasyPanel).
+ENV API_UPSTREAM=http://backend:3001
+
+# Plantilla: el entrypoint de nginx sustituye ${API_UPSTREAM} al arrancar.
+COPY nginx.conf.template /etc/nginx/templates/default.conf.template
 
 # Copiar el build generado
 COPY --from=build /app/dist /usr/share/nginx/html
