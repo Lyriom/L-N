@@ -20,13 +20,15 @@ const num = (v, d = 0) => (v === undefined || v === null || v === '' ? d : Numbe
 
 app.get('/api/health', (_req, res) => res.json({ ok: true }))
 
-// Catálogo público: solo productos activos con stock.
+// Catálogo público: solo productos activos, con stock y CON foto válida
+// (los que no tienen foto se gestionan en el admin pero no se muestran en la tienda).
 app.get('/api/products', async (_req, res, next) => {
   try {
     const [rows] = await pool.query(
       `SELECT id, code, category, name, type, size, qty, price, images
          FROM products
         WHERE active = 1 AND qty > 0
+          AND images IS NOT NULL AND JSON_LENGTH(images) > 0
         ORDER BY category, name`
     )
     res.json(rows)
