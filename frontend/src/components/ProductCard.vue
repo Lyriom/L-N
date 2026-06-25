@@ -36,7 +36,8 @@ function formatPrice(value) {
         loading="lazy"
       />
       <div v-else class="card-placeholder">
-        <span>{{ product.category?.charAt(0) ?? 'L' }}</span>
+        <img src="/logo-mark.png" alt="" class="card-placeholder-logo" />
+        <span class="card-placeholder-soon">Foto próximamente</span>
       </div>
 
       <span v-if="product.tag" class="card-tag">{{ product.tag }}</span>
@@ -50,7 +51,9 @@ function formatPrice(value) {
         <span v-if="product.sizes" class="card-sizes">Talla {{ formatSizes(product.sizes) }}</span>
       </p>
       <div class="card-footer">
-        <span class="card-price">{{ formatPrice(product.price) }}</span>
+        <span class="card-price">
+          {{ product.priceMax > product.price ? 'Desde ' : '' }}{{ formatPrice(product.price) }}
+        </span>
         <a
           :href="whatsappLink(product)"
           target="_blank"
@@ -107,8 +110,10 @@ function formatPrice(value) {
   width: 100%;
   height: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 12px;
   background: linear-gradient(
     135deg,
     color-mix(in srgb, var(--accent) 16%, var(--bg-soft)),
@@ -116,11 +121,23 @@ function formatPrice(value) {
   );
 }
 
-.card-placeholder span {
-  font-size: 3rem;
-  font-weight: 700;
-  color: color-mix(in srgb, var(--accent) 55%, var(--text-muted));
-  letter-spacing: 0.04em;
+.card-placeholder-logo {
+  width: 46%;
+  max-width: 120px;
+  opacity: 0.6;
+}
+
+[data-theme="dark"] .card-placeholder-logo {
+  filter: brightness(0) invert(1);
+  opacity: 0.5;
+}
+
+.card-placeholder-soon {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
 }
 
 .card-tag {

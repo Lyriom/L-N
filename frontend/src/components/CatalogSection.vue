@@ -7,22 +7,57 @@ import { api, photoUrl } from '../api.js'
 /*
  * Catálogo público de LØN.
  * Los productos vienen del backend (/api/products): solo activos y con stock.
- * Cada producto: { id, code, category, name, type, size, qty, price, images[] }.
+ * Cada fila: { id, code, category, name, type, size, qty, price, images[] }.
+ * Aquí agrupamos las filas de la misma prenda (mismo nombre) en una sola
+ * tarjeta con sus distintas tallas como variantes.
  */
 const products = ref([])
 const loading = ref(true)
 const error = ref('')
 
+// Agrupa filas por nombre+categoría -> una tarjeta con variantes (tallas).
+function groupProducts(list) {
+  const groups = new Map()
+  for (const p of list) {
+    const key = `${(p.name || '').trim().toLowerCase()}|${p.category || ''}`
+    if (!groups.has(key)) {
+      groups.set(key, {
+        key,
+        name: p.name,
+        category: p.category,
+        type: p.type,
+        variants: [],
+        _images: [],
+        _sizes: [],
+      })
+    }
+    const g = groups.get(key)
+    g.variants.push({ id: p.id, code: p.code, size: p.size, qty: p.qty, price: Number(p.price) })
+    for (const img of p.images || []) if (!g._images.includes(img)) g._images.push(img)
+    if (p.size && !g._sizes.includes(p.size)) g._sizes.push(p.size)
+  }
+  return [...groups.values()].map((g) => {
+    const prices = g.variants.map((v) => v.price)
+    const gallery = g._images.map(photoUrl)
+    return {
+      key: g.key,
+      name: g.name,
+      category: g.category,
+      type: g.type,
+      variants: g.variants,
+      sizes: g._sizes,
+      gallery,
+      image: gallery[0] || null,
+      price: Math.min(...prices),
+      priceMax: Math.max(...prices),
+    }
+  })
+}
+
 onMounted(async () => {
   try {
     const data = await api.products()
-    // Adaptamos al formato que esperan las tarjetas/modal.
-    products.value = data.map((p) => ({
-      ...p,
-      sizes: p.size,
-      image: p.images?.length ? photoUrl(p.images[0]) : null,
-      gallery: (p.images || []).map(photoUrl),
-    }))
+    products.value = groupProducts(data)
   } catch (e) {
     error.value = 'No se pudo cargar el catálogo. Intenta más tarde.'
   } finally {
@@ -84,7 +119,7 @@ const selected = ref(null)
       <div v-else class="grid">
         <ProductCard
           v-for="product in filteredProducts"
-          :key="product.id"
+          :key="product.key"
           :product="product"
           @select="selected = product"
         />

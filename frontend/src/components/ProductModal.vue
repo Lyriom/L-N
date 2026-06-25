@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, onUnmounted } from 'vue'
+import { ref, computed, watch, onUnmounted } from 'vue'
 import { formatSizes, whatsappLink } from '../config.js'
 
 const props = defineProps({
@@ -11,14 +11,32 @@ const props = defineProps({
 
 const emit = defineEmits(['close'])
 
-// Foto activa de la galería (se reinicia al abrir otro producto).
+// Foto activa de la galería y talla seleccionada (se reinician al abrir otro producto).
 const activeImage = ref(null)
+const selectedSize = ref(null)
 watch(
   () => props.product,
   (p) => {
     activeImage.value = p?.image || null
+    selectedSize.value = p?.sizes?.length ? p.sizes[0] : null
   }
 )
+
+// Variante (talla) activa y su precio.
+const activeVariant = computed(() => {
+  const variants = props.product?.variants || []
+  return variants.find((v) => v.size === selectedSize.value) || variants[0] || null
+})
+const activePrice = computed(() =>
+  activeVariant.value ? activeVariant.value.price : props.product?.price ?? 0
+)
+
+// Objeto para el enlace de WhatsApp con la talla y precio elegidos.
+const waProduct = computed(() => ({
+  name: props.product?.name,
+  sizes: selectedSize.value || '',
+  price: activePrice.value,
+}))
 
 function formatPrice(value) {
   return new Intl.NumberFormat('es-EC', {
@@ -71,7 +89,10 @@ onUnmounted(() => {
         <div class="modal" role="dialog" aria-modal="true" :aria-label="product.name">
           <div class="modal-media">
             <img v-if="activeImage" :src="activeImage" :alt="product.name" />
-            <div v-else class="modal-placeholder">{{ product.category?.charAt(0) ?? 'L' }}</div>
+            <div v-else class="modal-placeholder">
+              <img src="/logo-mark.png" alt="" class="modal-placeholder-logo" />
+              <span>Foto próximamente</span>
+            </div>
 
             <div v-if="product.gallery && product.gallery.length > 1" class="modal-thumbs">
               <button
@@ -90,18 +111,33 @@ onUnmounted(() => {
         <div class="modal-body">
           <p class="modal-category">{{ product.category }}</p>
           <h3 class="modal-name">{{ product.name }}</h3>
-          <p v-if="product.description" class="modal-desc">{{ product.description }}</p>
+
+          <div v-if="product.sizes && product.sizes.length" class="size-picker">
+            <span class="size-label">Talla</span>
+            <div class="size-options">
+              <button
+                v-for="s in product.sizes"
+                :key="s"
+                type="button"
+                class="size-btn"
+                :class="{ active: s === selectedSize }"
+                @click="selectedSize = s"
+              >
+                {{ s }}
+              </button>
+            </div>
+          </div>
 
           <ul class="modal-specs">
             <li v-if="product.type"><span>Tipo</span><strong>{{ product.type }}</strong></li>
-            <li v-if="product.sizes"><span>Talla</span><strong>{{ formatSizes(product.sizes) }}</strong></li>
-            <li><span>Precio</span><strong>{{ formatPrice(product.price) }}</strong></li>
+            <li v-if="selectedSize"><span>Talla</span><strong>{{ selectedSize }}</strong></li>
+            <li><span>Precio</span><strong>{{ formatPrice(activePrice) }}</strong></li>
           </ul>
 
           <p class="modal-note">Disponible en LØN.</p>
 
           <a
-            :href="whatsappLink(product)"
+            :href="whatsappLink(waProduct)"
             target="_blank"
             rel="noopener noreferrer"
             class="wa-btn"
@@ -249,12 +285,36 @@ onUnmounted(() => {
 
 .modal-placeholder {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 14px;
   height: 100%;
-  font-size: 4rem;
-  font-weight: 700;
+  width: 100%;
   color: var(--text-muted);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent) 14%, var(--bg-soft)),
+    var(--bg-soft)
+  );
+}
+
+.modal-placeholder-logo {
+  width: 42%;
+  max-width: 140px;
+  opacity: 0.6;
+}
+
+[data-theme="dark"] .modal-placeholder-logo {
+  filter: brightness(0) invert(1);
+  opacity: 0.5;
+}
+
+.modal-placeholder span {
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .modal-body {
@@ -280,6 +340,50 @@ onUnmounted(() => {
   color: var(--text-muted);
   line-height: 1.55;
   margin: 0 0 24px;
+}
+
+.size-picker {
+  margin: 0 0 22px;
+}
+
+.size-label {
+  display: block;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.size-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.size-btn {
+  min-width: 46px;
+  padding: 9px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background-color: var(--bg);
+  color: var(--text);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color var(--transition), background-color var(--transition),
+    color var(--transition);
+}
+
+.size-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.size-btn.active {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-contrast);
 }
 
 .modal-specs {
