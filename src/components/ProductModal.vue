@@ -52,14 +52,15 @@ onUnmounted(() => {
 <template>
   <Transition name="modal">
     <div v-if="product" class="overlay" @click.self="close">
-      <div class="modal" role="dialog" aria-modal="true" :aria-label="product.name">
+      <div class="dialog">
         <button class="close" type="button" aria-label="Cerrar" @click="close">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
             <path d="M6 6l12 12M18 6L6 18" />
           </svg>
         </button>
 
-        <div class="modal-media">
+        <div class="modal" role="dialog" aria-modal="true" :aria-label="product.name">
+          <div class="modal-media">
           <img v-if="product.image" :src="product.image" :alt="product.name" />
           <div v-else class="modal-placeholder">{{ product.category?.charAt(0) ?? 'L' }}</div>
         </div>
@@ -89,6 +90,7 @@ onUnmounted(() => {
             Pedir por WhatsApp
           </a>
         </div>
+        </div>
       </div>
     </div>
   </Transition>
@@ -107,11 +109,16 @@ onUnmounted(() => {
   backdrop-filter: blur(4px);
 }
 
-.modal {
+.dialog {
   position: relative;
+  width: min(860px, 100%);
+  max-height: 90vh;
+}
+
+.modal {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  width: min(860px, 100%);
+  width: 100%;
   max-height: 90vh;
   overflow: hidden;
   background-color: var(--bg-elevated);
@@ -122,9 +129,9 @@ onUnmounted(() => {
 
 .close {
   position: absolute;
-  top: 16px;
-  right: 16px;
-  z-index: 2;
+  top: -14px;
+  right: -14px;
+  z-index: 3;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -274,17 +281,20 @@ onUnmounted(() => {
   opacity: 0;
 }
 
-.modal-enter-active .modal,
-.modal-leave-active .modal {
+.modal-enter-active .dialog,
+.modal-leave-active .dialog {
   transition: transform 0.25s ease;
 }
 
-.modal-enter-from .modal,
-.modal-leave-to .modal {
+.modal-enter-from .dialog,
+.modal-leave-to .dialog {
   transform: translateY(16px) scale(0.98);
 }
 
 @media (max-width: 680px) {
+  .dialog {
+    max-height: 92vh;
+  }
   .modal {
     grid-template-columns: 1fr;
     max-height: 92vh;
