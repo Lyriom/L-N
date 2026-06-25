@@ -339,7 +339,7 @@ onMounted(async () => {
                   <div v-else class="thumb thumb--empty">—</div>
                 </td>
                 <td>{{ p.code }}</td>
-                <td class="cell-name">{{ p.name }}</td>
+                <td class="cell-name" title="Editar producto" @click="openEdit(p)">{{ p.name }}</td>
                 <td>{{ p.category }}</td>
                 <td>{{ p.size }}</td>
                 <td>
@@ -355,7 +355,7 @@ onMounted(async () => {
                   <button class="act sell" :disabled="p.qty <= 0" title="Registrar venta" @click="openSell(p)">
                     Vender
                   </button>
-                  <button class="act" title="Editar" @click="openEdit(p)">Editar</button>
+                  <button class="act edit" title="Editar / subir fotos" @click="openEdit(p)">✏️ Editar</button>
                   <button class="act" :title="p.active ? 'Ocultar' : 'Activar'" @click="toggleActive(p)">
                     {{ p.active ? 'Ocultar' : 'Activar' }}
                   </button>
@@ -657,7 +657,8 @@ onMounted(async () => {
 }
 .table tr:last-child td { border-bottom: none; }
 .table tr.dim { opacity: 0.5; }
-.cell-name { white-space: normal; min-width: 200px; font-weight: 500; }
+.cell-name { white-space: normal; min-width: 180px; font-weight: 500; cursor: pointer; }
+.cell-name:hover { color: var(--accent); }
 
 .thumb {
   width: 44px;
@@ -684,7 +685,7 @@ onMounted(async () => {
 .badge.on { background-color: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--accent); }
 .badge.off { background-color: color-mix(in srgb, #e5484d 16%, transparent); color: #e5484d; }
 
-.actions { display: flex; gap: 6px; }
+.actions { display: flex; flex-wrap: wrap; gap: 6px; max-width: 168px; }
 .act {
   padding: 6px 10px;
   border-radius: 8px;
@@ -694,11 +695,14 @@ onMounted(async () => {
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
-  transition: border-color var(--transition), color var(--transition);
+  white-space: nowrap;
+  transition: border-color var(--transition), color var(--transition),
+    background-color var(--transition);
 }
 .act:hover { border-color: var(--accent); color: var(--accent); }
 .act.sell { background-color: var(--accent); color: var(--accent-contrast); border-color: var(--accent); }
 .act.sell:disabled { opacity: 0.4; cursor: not-allowed; }
+.act.edit { border-color: var(--accent); color: var(--accent); }
 .act.danger:hover { border-color: #e5484d; color: #e5484d; }
 
 /* ---------- Toast ---------- */
